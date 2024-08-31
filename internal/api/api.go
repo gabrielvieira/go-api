@@ -20,8 +20,9 @@ type API struct {
 }
 
 type Response struct {
-	Message string `json:"message"`
-	Data    any    `json:"data"`
+	Message   string `json:"message,omitempty"`
+	ErrorCode string `json:"error_code,omitempty"`
+	Data      any    `json:"data,omitempty"`
 }
 
 func New(config *config.Config, db *db.DB, logger *zap.Logger) *API {

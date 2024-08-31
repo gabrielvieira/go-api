@@ -56,7 +56,7 @@ func (s *Server) Run(ctx context.Context) {
 	<-quit
 	log.Println("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 	// stop API and workers
 	if err := s.api.Stop(ctx); err != nil {
@@ -65,7 +65,7 @@ func (s *Server) Run(ctx context.Context) {
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
+		log.Println("timeout of 1 seconds.")
 	}
 	log.Println("Server exiting")
 }

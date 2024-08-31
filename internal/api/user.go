@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"github.com/gabrielvieira/go-api/internal/db/model"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -17,7 +19,7 @@ type CreateUserRequest struct {
 }
 
 type GetUserRequest struct {
-	Id string `json:"id"`
+	Id string `uri:"id" binding:"required"`
 }
 
 type GetUserResponse struct {
@@ -33,5 +35,29 @@ func (a *API) CreateUser(c *gin.Context) {
 }
 
 func (a *API) GetUser(c *gin.Context) {
-	c.Status(http.StatusOK)
+	var req GetUserRequest
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(http.StatusBadRequest, &Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	var user model.User
+	result := a.db.First(&user, req.Id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.Status(http.StatusNotFound)
+			return
+		}
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, &Response{
+		Message: "user found with success",
+		Data: &GetUserResponse{
+			User: user,
+		},
+	})
 }
