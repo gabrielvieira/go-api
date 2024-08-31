@@ -6,10 +6,16 @@ import (
 	"github.com/gabrielvieira/go-api/internal/config"
 	"github.com/gabrielvieira/go-api/internal/db"
 	"github.com/gabrielvieira/go-api/internal/logger"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 type Server struct {
-	api *api.API
+	api    *api.API
+	config *config.Config
 }
 
 func New() (*Server, error) {
@@ -32,14 +38,34 @@ func New() (*Server, error) {
 	a := api.New(c, d, l)
 
 	return &Server{
-		api: a,
+		api:    a,
+		config: c,
 	}, nil
 }
 
-func (s *Server) Start(ctx context.Context) error {
-	return s.api.Start()
-}
+func (s *Server) Run(ctx context.Context) {
+	// init API and workers
+	go func() {
+		if err := s.api.Start(ctx); err != nil {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	// wait for quit signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutdown Server ...")
 
-func (s *Server) Stop(ctx context.Context) error {
-	return nil
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	// stop API and workers
+	if err := s.api.Stop(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+	// catching ctx.Done(). timeout of 5 seconds.
+	select {
+	case <-ctx.Done():
+		log.Println("timeout of 5 seconds.")
+	}
+	log.Println("Server exiting")
 }
