@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gabrielvieira/go-api/internal/config"
+	"github.com/gabrielvieira/go-api/internal/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,12 @@ func main() {
 		panic(err)
 	}
 
+	l, err := logger.New(c)
+	if err != nil {
+		panic(err)
+	}
+
+	l.Info("ola")
 	fmt.Printf("%+v\n", c)
 
 	//r := gin.Default()

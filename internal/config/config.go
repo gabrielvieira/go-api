@@ -16,6 +16,10 @@ type Config struct {
 	DBConnectionMaxLifetimeSeconds time.Duration `mapstructure:"db_connection_max_lifetime_seconds"` // int64
 
 	APIPort string `mapstructure:"api_port"`
+
+	LogLevel         string `mapstructure:"log_level"`
+	LogFormat        string `mapstructure:"log_format"`
+	logDeveloperMode bool   `mapstructure:"log_developer_mode"`
 }
 
 func New() (*Config, error) {
@@ -24,7 +28,8 @@ func New() (*Config, error) {
 
 	viper.SetConfigName(getConfigName())
 	viper.AddConfigPath("configs")
-	viper.SetDefault("api_port", 9090)
+	// load default config
+	defaultConfig()
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
@@ -35,6 +40,13 @@ func New() (*Config, error) {
 	}
 
 	return &config, nil
+}
+
+func defaultConfig() {
+	viper.SetDefault("api_port", 9090)
+	viper.SetDefault("log_level", "info")
+	viper.SetDefault("log_format", "json")
+	viper.SetDefault("log_developer_mode", false)
 }
 
 func getConfigName() string {
