@@ -43,7 +43,7 @@ func New() (*Config, error) {
 }
 
 func defaultConfig() {
-	viper.SetDefault("api_port", 9090)
+	viper.SetDefault("api_port", 8080)
 	viper.SetDefault("log_level", "info")
 	viper.SetDefault("log_format", "json")
 	viper.SetDefault("log_developer_mode", false)
