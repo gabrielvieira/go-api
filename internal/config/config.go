@@ -23,7 +23,6 @@ type Config struct {
 }
 
 func New() (*Config, error) {
-
 	var config Config
 
 	viper.SetConfigName(getConfigName())

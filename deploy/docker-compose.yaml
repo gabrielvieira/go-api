@@ -7,5 +7,4 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "Y!*zrkNQ8RZiyKrd8Zjj"
     ports:
-     - "3306:3306"
-    # (this is just an example, not intended to be a production configuration)
+      - "3306:3306"

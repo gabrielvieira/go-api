@@ -40,16 +40,16 @@ func (d *DB) Open() error {
 		Conn: mysqlConn,
 	}), &gorm.Config{})
 
-	err = d.RunMigrations()
+	d.DB = *gormDB
+
+	err = d.runMigrations()
 	if err != nil {
 		return err
 	}
-
-	d.DB = *gormDB
 	return nil
 }
 
-func (d *DB) RunMigrations() error {
+func (d *DB) runMigrations() error {
 	err := d.DB.AutoMigrate(&model.User{})
 	if err != nil {
 		return err
